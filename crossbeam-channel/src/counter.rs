@@ -73,6 +73,17 @@ impl<C> Sender<C> {
             }
         }
     }
+
+    /// Exposes the "provenance" part of the inner pointer for future use in
+    pub(crate) unsafe fn expose_provenance(&self) -> usize {
+        self.counter.expose_provenance()
+    }
+
+    /// Converts an address back to a Sender
+    pub(crate) unsafe fn with_exposed_provenance(addr: usize) -> Sender<C> {
+        let counter = std::ptr::with_exposed_provenance_mut(addr);
+        Sender { counter }
+    }
 }
 
 impl<C> ops::Deref for Sender<C> {
@@ -127,6 +138,17 @@ impl<C> Receiver<C> {
                 drop(Box::from_raw(self.counter));
             }
         }
+    }
+
+    /// Exposes the "provenance" part of the inner pointer for future use in
+    pub(crate) unsafe fn expose_provenance(&self) -> usize {
+        self.counter.expose_provenance()
+    }
+
+    /// Converts an address back to a Receiver
+    pub(crate) unsafe fn with_exposed_provenance(addr: usize) -> Receiver<C> {
+        let counter = std::ptr::with_exposed_provenance_mut(addr);
+        Receiver { counter }
     }
 }
 

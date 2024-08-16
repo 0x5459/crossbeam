@@ -650,6 +650,21 @@ impl<T> Sender<T> {
             _ => false,
         }
     }
+
+    /// Exposes the "provenance" part of the inner pointer for future use in
+    pub unsafe fn expose_provenance(&self) -> usize {
+        match &self.flavor {
+            SenderFlavor::Zero(chan) => chan.expose_provenance(),
+            _ => panic!("`expose_provenance` only available for `bounded(0)` channels"),
+        }
+    }
+
+    /// Converts an address back to a Sender
+    pub unsafe fn with_exposed_provenance(addr: usize) -> Self {
+        Sender {
+            flavor: SenderFlavor::Zero(counter::Sender::with_exposed_provenance(addr)),
+        }
+    }
 }
 
 impl<T> Drop for Sender<T> {
@@ -1143,6 +1158,21 @@ impl<T> Receiver<T> {
             (ReceiverFlavor::Tick(a), ReceiverFlavor::Tick(b)) => Arc::ptr_eq(a, b),
             (ReceiverFlavor::Never(_), ReceiverFlavor::Never(_)) => true,
             _ => false,
+        }
+    }
+
+    /// Exposes the "provenance" part of the inner pointer for future use in
+    pub unsafe fn expose_provenance(&self) -> usize {
+        match &self.flavor {
+            ReceiverFlavor::Zero(chan) => chan.expose_provenance(),
+            _ => panic!("`expose_provenance` only available for `bounded(0)` channels"),
+        }
+    }
+
+    /// Converts an address back to a Receiver
+    pub unsafe fn with_exposed_provenance(addr: usize) -> Self {
+        Receiver {
+            flavor: ReceiverFlavor::Zero(counter::Receiver::with_exposed_provenance(addr)),
         }
     }
 }

@@ -320,6 +320,7 @@
 //! [`recv`]: Receiver::recv
 //! [`iter`]: Receiver::iter
 //! [`try_iter`]: Receiver::try_iter
+#![feature(exposed_provenance)]
 
 #![no_std]
 #![doc(test(
